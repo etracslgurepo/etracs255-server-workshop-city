@@ -2876,7 +2876,7 @@ DROP TABLE psic
 go
 
 
-update aa 
+update aa set 
   aa.psicid = bb.psicid 
 from 
   lob aa, 
