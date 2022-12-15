@@ -25,8 +25,8 @@ class RealPropertyListService extends ActiveListService
     public def getColumns(params) {
         return [
             [name:"ry", caption:"RY", width:50, type:'integer', format:'0000'],
-            [name:"pin", caption:"PIN", width:150],
-            [name:"tdno", caption:"TD No.", width:150],
+            [name:"pin", caption:"PIN", width:160],
+            [name:"tdno", caption:"TD No.", width:180],
             [name:"barangay.name", caption:"Barangay", width:200],
             [name:"claimno", caption:"Claim No.", width:50],
             [name:"cadastrallotno", caption:"Lot No.", width:150],

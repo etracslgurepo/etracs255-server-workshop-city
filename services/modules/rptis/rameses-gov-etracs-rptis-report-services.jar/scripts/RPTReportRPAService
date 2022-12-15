@@ -44,7 +44,7 @@ class RPTReportRPAService
 		def exemptclasses = []
 		def restrictions = []
 
-		if (params.reporttype.type == 'standard'){
+		if (params.reportformat.type == 'standard'){
 			if (params.distributiontype == 'DOMINANT') {
 				taxableclasses = buildTaxableClasses(em.getTaxables(params), params)
 			} else {
@@ -52,7 +52,7 @@ class RPTReportRPAService
 			}
 			exemptclasses = buildExemptClasses(em.getExempts(params), params)	
 		}
-		else if (params.reporttype.type == 'lift'){
+		else if (params.reportformat.type == 'lift'){
 			if (util.toBoolean(var.assessor_report_lift_show_net, true)) {
 				params.filter += " AND not exists(select * from faas_restriction where parent_objid = f.objid and state = 'ACTIVE') "
 			}
@@ -63,10 +63,10 @@ class RPTReportRPAService
 			}
 			exemptclasses = buildExemptClasses(em.getLiftExempts(params), params)	
 		}
-		else if (params.reporttype.type == 'lift_restriction'){
+		else if (params.reportformat.type == 'lift_restriction'){
 			restrictions = buildRestrictions(params)
 		}
-		else if (params.reporttype.type == 'lift_idleland'){
+		else if (params.reportformat.type == 'lift_idleland'){
 			if (util.toBoolean(var.assessor_report_lift_show_net, true)) {
 				params.filter += " AND not exists(select * from faas_restriction where parent_objid = f.objid and state = 'ACTIVE') "
 			}
@@ -74,7 +74,7 @@ class RPTReportRPAService
 			exemptclasses = buildExemptClasses(em.getLiftIdleLandExempts(params), params)	
 		}
 		else{
-			throw new Exception('Report Type ' + params.reporttype.caption + ' is not supported.')
+			throw new Exception('Report Type ' + params.reportformat.caption + ' is not supported.')
 		}
 
 
@@ -123,11 +123,25 @@ class RPTReportRPAService
 			params.barangayid = params.barangay.objid 
 		}
 
+        if (params.reporttype && 'GR'.equalsIgnoreCase(params.reporttype)) {
+            params.txntypeid = 'GR'
+            params.filter += ' AND f.txntype_objid = $P{txntypeid} ' 
+        }
+        if (params.reporttype && 'MAINTENANCE'.equalsIgnoreCase(params.reporttype)) {
+            params.txntypeid = 'GR'
+            params.filter += ''' 
+                AND f.txntype_objid <> $P{txntypeid}
+                AND (
+                    (f.dtapproved >= $P{startdate} AND f.dtapproved < $P{enddate} AND f.state = 'CURRENT' ) OR 
+                    (f.dtapproved >= $P{startdate} AND f.dtapproved < $P{enddate} AND f.canceldate >= $P{enddate} AND f.state = 'CANCELLED' )
+                )
+            '''
+        }
 	}
 
 	def buildTaxableClasses(taxables, params){
 		taxables.each{ item ->
-			if (params.reporttype.type == 'standard'){
+			if (params.reportformat.type == 'standard'){
 				item.basicrate = params.basicrate
 				item.sefrate = params.sefrate
 				item.basictax = numSvc.round((item.totalav - item.totalrestrictionav) * item.basicrate )
@@ -177,7 +191,7 @@ class RPTReportRPAService
 
 		def restrictions = em.getLiftRestrictions(params)
 		restrictions.each{ item -> 
-			if (params.reporttype.type == 'standard'){
+			if (params.reportformat.type == 'standard'){
 				item.basicrate = params.basicrate/100.0
 				item.sefrate = params.sefrate/100.0
 				item.basictax = numSvc.round((item.totalav - item.totalrestrictionav) * item.basicrate)

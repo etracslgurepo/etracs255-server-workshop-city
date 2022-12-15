@@ -39,6 +39,9 @@ class ResectionService
 	@DataContext('resection_task')
 	def em_task
 
+	@DataContext('faas')
+	def em_faas 
+
 	@DataContext('faas_list')
 	def em_faas_list 
 
@@ -182,6 +185,10 @@ class ResectionService
     public void validateNewTdNo(newfaas) {
         if (!newfaas.tdno) throw new Exception('New TD No. must be specified')
         faasSvc.checkDuplicateTdNo( newfaas.objid, newfaas.tdno )
+        
+        def tdno = [tdno: newfaas.tdno, utdno: newfaas.tdno]
+        em_faas.find([objid: newfaas.objid]).update(tdno)
+        em_faas_list.find([objid: newfaas.objid]).update(tdno)
     }
 
     @ProxyMethod
@@ -192,15 +199,16 @@ class ResectionService
         def newfaas = resectionitem.newfaas;
         if (!newfaas.fullpin) throw new Exception('New PIN must be specified');
 
-        def duplicate = em_resection_item
+        def duplicates = em_resection_item
             .select('faas.*')
             .find([parent_objid: resectionitem.parent.objid])
-            .where('faas_objid <> :faasid AND newfaas_fullpin = :fullpin', [
+            .where('faas_objid <> :faasid and newfaas_fullpin = :fullpin', [
                 faasid: resectionitem.faas.objid,
                 fullpin: resectionitem.newfaas.fullpin
-            ]).first()
+            ]).list()
 
-        if (duplicate) {
+        if (duplicates.size() > 0) {
+            def duplicate = duplicates.first()
             def msg = 'Section ' + resectionitem.newfaas.section
             msg += ' Parcel ' + resectionitem.newfaas.parcel
             msg += ' is already assigned to PIN ' + duplicate.faas.pin 

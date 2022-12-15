@@ -90,7 +90,7 @@ select r.ry
 from faas f
 	inner join rpu r on f.rpuid = r.objid 
 where f.objid = $P{faasid} 
-and f.year = $P{asofyear}
+and f.year <= $P{asofyear}
 
 
 

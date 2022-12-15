@@ -357,14 +357,16 @@ SELECT
 	'SQM' AS areatype,
 	r.rputype,
 	bra.taxable,
-	(case when r.taxable = '1' then r.assessedvalue else 0 end) as ttaxable,
-	(case when r.taxable = '0' then r.assessedvalue else 0 end) as texempt
+	(case when bra.taxable = '1' then bra.assessedvalue else 0 end) as ttaxable,
+	(case when bra.taxable = '0' then bra.assessedvalue else 0 end) as texempt
 FROM faas f
 	INNER JOIN rpu r ON f.rpuid = r.objid 
 	INNER JOIN propertyclassification pc ON r.classification_objid = pc.objid 
 	INNER JOIN rpu_assessment bra ON r.objid = bra.rpuid 
 	INNER JOIN planttreeassesslevel ptal ON bra.actualuse_objid = ptal.objid 
 WHERE f.objid = $P{faasid}	
+
+
 
 
 [getMiscItems]

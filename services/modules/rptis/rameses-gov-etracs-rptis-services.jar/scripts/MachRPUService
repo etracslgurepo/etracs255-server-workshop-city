@@ -120,6 +120,8 @@ class MachRPUService
                 m.objid = util.generateId('MD')
                 m.machuseid = mu.objid 
                 m.machrpuid = rpu.objid 
+                m.newlyinstalled = false
+                m.taxable = util.toBoolean(m.taxable, true)
             }
         }
     }
@@ -246,16 +248,10 @@ class MachRPUService
                                          machine.brokeragecost + machine.arrastrecost + 
                                          machine.othercost 
             cost = machine.acquisitioncost
+            machine.replacementcost = 0
         }
         else {
-            machine.acquisitioncost  = 0.0
-            machine.freightcost      = 0.0
-            machine.insurancecost    = 0.0
-            machine.installationcost = 0.0
-            machine.brokeragecost    = 0.0
-            machine.arrastrecost     = 0.0
-            machine.othercost        = 0.0
-            machine.replacementcost  = 0.0
+            cost = machine.replacementcost
         } 
         if( util.isTrue(machine.imported) && machine.ferac > 0.0) {
             def factor = numberSvc.roundA(machine.forex / machine.ferac, 6)
@@ -376,7 +372,9 @@ class MachRPUService
         rpu.machuses = em.getMachUses([machrpuid:rpu.objid])
         rpu.machuses.each{ mu ->
             mu.taxable = util.toBoolean(mu.taxable, true)
-            mu.machines = em_machdetail.find([machuseid: mu.objid]).list()
+            mu.machines = em_machdetail.find([machuseid: mu.objid]).list().each{m ->
+                m.taxable = util.toBoolean(m.taxable, true)
+            }
         }
          
     }

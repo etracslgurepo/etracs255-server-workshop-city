@@ -116,10 +116,12 @@ select
 	rp.surveyno as landsurveyno,
 	rp.blockno as landblockno,
 	rp.portionof,
-	f.administrator_name as landadminname
+	f.administrator_name as landadminname,
+	pc.name as landclassification
  from rpu r 
 	inner join faas f on f.rpuid = r.objid 
 	inner join realproperty rp on f.realpropertyid = rp.objid
+	inner join propertyclassification pc on r.classification_objid = pc.objid 
 where r.objid=$P{landrpuid}
 order by f.dtapproved desc
 

@@ -31,6 +31,9 @@ class RPTUtil
     @Service('Var')
     def varSvc
 
+    @Service('UserRoleService')
+    def userRoleSvc
+
     @DataContext('org')
     def em_org 
 
@@ -870,6 +873,16 @@ class RPTUtil
         }
 
         return true;
+	}
+
+	@ProxyMethod
+	public def checkUserRole(param) {
+        if(!param.role) throw new Exception("role is required");
+        if(!param.domain) throw new Exception("domain is required");
+		param.userid = param.userid ? param.userid : env.USERID;
+        def roles = userRoleSvc.getRolesByUser(param);
+		if (!roles) return false;
+        return roles.find{ it.domain == param.domain && it.role.matches('.*' + param.role + '.*') } != null;
 	}
 
 }

@@ -637,18 +637,33 @@ select
 
 
 [getAbstractOfRPTCollectionDetail]
-select 
-  c.objid,
-  c.receiptno,
-  c.receiptdate as ordate,
-  case when cv.objid is null then c.paidby else '*** VOIDED ***' end as taxpayername, 
-  case when cv.objid is null then c.amount else 0.0 end AS amount 
-from cashreceipt c 
-  inner join cashreceipt_rpt crpt on crpt.objid = c.objid
-  left join cashreceipt_void cv on cv.receiptid  = c.objid 
-where c.remittanceid=$P{remittanceid} 
-  and cv.objid is null 
-order by c.receiptno  
+select x.*
+from (
+
+  select 
+    c.objid,
+    c.receiptno,
+    c.receiptdate as ordate,
+    case when cv.objid is null then c.paidby else '*** VOIDED ***' end as taxpayername, 
+    case when cv.objid is null then c.amount else 0.0 end AS amount 
+  from cashreceipt c 
+    inner join cashreceipt_rpt crpt on crpt.objid = c.objid
+    left join cashreceipt_void cv on cv.receiptid  = c.objid 
+  where c.remittanceid = $P{remittanceid} 
+    and cv.objid is null 
+
+  union all  
+
+  select 
+    c.objid,
+    c.receiptno,
+    c.receiptdate as ordate,
+    c.paidby as taxpayername, 
+    c.amount
+  from vw_landtax_eor c
+  where c.remittanceid = $P{remittanceid} 
+)x 
+order by x.receiptno  
 
 
 [getAbstractOfRPTCollectionDetailItem]

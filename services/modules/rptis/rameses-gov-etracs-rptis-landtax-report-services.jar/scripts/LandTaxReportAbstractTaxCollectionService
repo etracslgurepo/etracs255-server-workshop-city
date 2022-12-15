@@ -79,10 +79,10 @@ class LandTaxReportAbstractTaxCollectionService {
         header.dtposted = dtsvc.format('MMMMM dd, yyyy', entity.controldate )
         header.REMITTANCEDATE = header.dtposted;
         header.REMITTANCEAMOUNT = entity.amount
-        header.COLLECTORNAME = entity.collector.name
-        header.COLLECTORTITLE = entity.collector.title
-        header.LIQUIDATINGOFFICER = entity.liquidatingofficer.name
-        header.LIQUIDATINGOFFICERTITLE = entity.liquidatingofficer.title
+        header.COLLECTORNAME = entity.collector?.name
+        header.COLLECTORTITLE = entity.collector?.title
+        header.LIQUIDATINGOFFICER = entity.liquidatingofficer?.name
+        header.LIQUIDATINGOFFICERTITLE = entity.liquidatingofficer?.title
         header.DATEPOSTED =  entity.controldate ;
         header.AMTINWORDS = numSvc.convertDouble( entity.amount )
 

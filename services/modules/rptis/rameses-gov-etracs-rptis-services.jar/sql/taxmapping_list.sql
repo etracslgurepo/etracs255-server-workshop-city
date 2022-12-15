@@ -11,8 +11,10 @@ FROM faas f
 	INNER JOIN barangay b ON rp.barangayid = b.objid  
 WHERE rp.barangayid = $P{objid}
   AND rp.ry = $P{ry} 
-  AND f.state = 'CURRENT'
+	AND f.state in ('CURRENT','CANCELLED')
+  AND f.state like $P{state}
   AND r.rputype = 'land'
+	${filter}
 GROUP BY rp.barangayid, rp.ry, rp.section	
 ORDER BY rp.section
 
@@ -20,6 +22,7 @@ ORDER BY rp.section
 [getFaasList]
 select 
 	f.objid,
+	f.state,
 	f.tdno,
 	f.fullpin,
 	f.titleno,
@@ -31,7 +34,8 @@ select
 	r.totalmv,
 	r.totalav,
 	pc.code as class,
-	r.taxable
+	r.taxable,
+	f.txntype_objid
 from faas f
 	inner join rpu r on f.rpuid = r.objid 
 	inner join propertyclassification pc on r.classification_objid = pc.objid 
@@ -40,8 +44,10 @@ from faas f
 where rp.barangayid = $P{barangayid}
   and rp.ry = $P{ry} 
   and rp.section = $P{section}
-  and f.state = 'CURRENT'
+  AND f.state in ('CURRENT','CANCELLED')
+  AND f.state like $P{state}
   and r.rputype = 'land'
+	${filter}
 order by f.fullpin  
 
 [getRevisionYears]

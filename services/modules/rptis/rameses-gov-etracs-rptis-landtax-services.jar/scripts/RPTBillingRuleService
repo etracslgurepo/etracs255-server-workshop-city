@@ -253,6 +253,10 @@ public class RPTBillingRuleService
 			return false 
 		}
 
+		if (rptledger.lastyearpaid == bill.cy && rptledger.lastqtrpaid == 4 ){
+			return false
+		}
+
 		if (rptledger.lastyearpaid == bill.cy && rptledger.lastqtrpaid + 1 < bill.cqtr){
 			return false
 		}

@@ -48,12 +48,12 @@ public class AddAssessmentInfo implements RuleActionHandler {
                     marketvalue  : item.marketvalue,
                     exemptedmarketvalue : (item.taxable == false ? item.marketvalue : 0.0),
                     taxable 		: item.taxable, 
-                    assesslevel  : item.assesslevel,
+                    assesslevel  : miscrpu.assesslevel,
                     assessedvalue  : item.assessedvalue,
                 ]
-                
+
                 a = new RPUAssessment(assessmentinfo)
-                a.assesslevel = item.assesslevel
+                a.assesslevel = assessmentinfo.assesslevel
                 a.assessedvalue = item.assessedvalue
                 entity.assessments << assessmentinfo
                 request.assessments << a

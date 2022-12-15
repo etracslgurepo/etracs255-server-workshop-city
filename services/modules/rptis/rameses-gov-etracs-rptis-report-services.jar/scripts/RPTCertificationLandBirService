@@ -52,7 +52,7 @@ class RPTCertificationLandBirService
 	@ProxyMethod
 	public def createCertification( cert ) {
 		certSvc.createCertification(cert)
-		cert.properties.each{
+		cert.items.each{
 			em.createItem([objid:cert.objid, refid:it.objid])
 		}
 		cert.items = multipleSvc.getItems(cert)
